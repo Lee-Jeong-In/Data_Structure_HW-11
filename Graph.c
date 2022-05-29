@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -239,7 +240,10 @@ void InsertEdge(adjList* head)			// 문제점 vertex의 메모리 leak가 발생 할 수 있�
 
 	newNode = (node*)malloc(sizeof(node));			// 새로운 노드 만들고
 	newNode->vertex = input;
-	newNode->next = NULL;
+	newNode->next = head->adjList_H[index];
+	head->adjList_H[index] = newNode;
+
+
 
 	//if (head->adjList_H[index]->next == NULL)		// 아무것도 없고+맨 처음일 때
 	//{
@@ -247,36 +251,39 @@ void InsertEdge(adjList* head)			// 문제점 vertex의 메모리 leak가 발생 할 수 있�
 	//	return;
 	//}
 
-	node* temp = head->adjList_H[index];
-	node* trail = head->adjList_H[index];
+	//node* temp = head->adjList_H[index];
+	//node* trail = head->adjList_H[index];
 
-	if (temp == NULL)
-	{
-		printf("There is no vertex in Graph!!\n");
-		return;
-	}
 
-	while (temp != NULL)
-	{
-		if (temp->vertex >= newNode->vertex)
-		{
-			if (temp == head->adjList_H[index]->next)		// 뒤에 노드가 있는데 처음으로 삽입 해야 할 때
-			{
-				head->adjList_H[index]->next = newNode;
-				newNode->next = temp;
-			}
-			else										// 중간에 삽입 해야 할때
-			{
-				newNode->next = temp;
-				trail->next = newNode;
-			}
-			return;
-		}
-		trail = temp;
-		temp = temp->next;
-	}
-	trail->next = newNode;									// 마지막에 삽입할 때
-	return;
+
+
+	//if (temp == NULL)
+	//{
+	//	printf("There is no vertex in Graph!!\n");
+	//	return;
+	//}
+
+	//while (temp != NULL)
+	//{
+	//	if (temp->vertex >= newNode->vertex)
+	//	{
+	//		if (temp == head->adjList_H[index]->next)		// 뒤에 노드가 있는데 처음으로 삽입 해야 할 때
+	//		{
+	//			head->adjList_H[index]->next = newNode;
+	//			newNode->next = temp;
+	//		}
+	//		else										// 중간에 삽입 해야 할때
+	//		{
+	//			newNode->next = temp;
+	//			trail->next = newNode;
+	//		}
+	//		return;
+	//	}
+	//	trail = temp;
+	//	temp = temp->next;
+	//}
+	//trail->next = newNode;									// 마지막에 삽입할 때
+	//return;
 }
 
 int isEmpty()				// stact이 비어있는지 확인한다.
