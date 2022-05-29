@@ -1,7 +1,5 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-
 
 #define MAX_VERTEX 10
 
@@ -22,8 +20,24 @@ typedef struct Adj_List		// 리스트 구조체
 	int Q_visited[MAX_VERTEX];		// queue용 visited 배열
 }adjList;
 
-node* top;						// stack용
+/* Stack */
+typedef int element;
+typedef struct stackNode
+{
+	int data;
+	struct stackNode* link;
+}stackNode;
 
+stackNode* top;						// stack용
+
+int isEmpty();
+void push(int item);
+int pop();
+void DFS(adjList* head);
+
+
+
+/* Queue */
 typedef struct QNode
 {
 	int data;
@@ -38,24 +52,19 @@ LQueueType* createQueue();
 int Q_isEmpty(LQueueType* LQ);
 void enQueue(LQueueType* LQ, int v);
 int deQueue(LQueueType* LQ);
-
-node* queue[MAX_VERTEX];
-int front = -1;
-int rear = -1;
-node* Dequeue();
-void Enqueue(node* anode);
+void BFS(adjList* head);
 
 void InitGraph(adjList* head);
 void InsertVertex(adjList* head);
 void InsertEdge(adjList* head);
 void PrintGraph(adjList* head);
 
-int pop();
-void push(int item);
-int isEmpty();
-void DFS(adjList* head);
+//int pop();
+//void push(int item);
+//int isEmpty();
+//void DFS(adjList* head);
 
-void BFS(adjList* head);
+
 
 void FreeGraph(adjList* head);
 
@@ -286,7 +295,8 @@ void InsertEdge(adjList* head)			// 문제점 vertex의 메모리 leak가 발생 할 수 있�
 	//return;
 }
 
-int isEmpty()				// stact이 비어있는지 확인한다.
+
+int isEmpty()				// stack이 비어 있는지 확인
 {
 	if (top == NULL)
 		return 1;
@@ -294,38 +304,37 @@ int isEmpty()				// stact이 비어있는지 확인한다.
 		return 0;
 }
 
-int pop()
+void push(int item)			// 한번 걷쳐간 vertex를 stack에 넣는다.
+{
+	stackNode* temp = (stackNode*)malloc(sizeof(stackNode));
+	temp->data = item;
+	temp->link = top;
+	top = temp;
+}
+
+int pop()					// 인접한 노드가 모두 True일때, stack에서 뺀다.
 {
 	int item;
-	node* temp = top;
+	stackNode* temp = top;
 
-	if (isEmpty())
+	if (isEmpty())			// isEmpty가 true이면 즉, top==null 일때
 	{
-		printf("\n\n Stack is Empyh!\n");
+		printf("\n Stack is empty!\n");
 		return 0;
 	}
 	else
 	{
-		item = temp->vertex;
-		top = temp->next;
+		item = temp->data;
+		top = temp->link;
 		free(temp);
 		return item;
 	}
 
 }
-
-void push(int item)
-{
-	node* temp = (node*)malloc(sizeof(node));
-	temp->vertex = item;
-	temp->next = top;
-	top = temp;
-}
-
 void DFS(adjList* head)
 {
 	int index;
-	node* adj;
+	node* w;
 	top = NULL;
 
 	printf("\nChoice Start Vertex : ");				// 시작 vertex 입력받기
@@ -336,32 +345,107 @@ void DFS(adjList* head)
 		printf("There is no vertex in Graph!!\n");
 		return;
 	}
-
-	push(index);						// dfs 시작
+	push(index);
 	head->visited[index] = TRUE;
 	printf("%d", index);
 
-	while (!isEmpty())
+	while (!isEmpty())								// stack에 있을 때
 	{
-		adj = head->adjList_H[index];
-		while (adj)
+		w = head->adjList_H[index];
+		while (w)
 		{
-			if (!(head->visited[adj->vertex]))
+			if (!(head->visited[w->vertex]))		// 인접 vertex 있을 때
 			{
-				push(adj->vertex);
-				head->visited[adj->vertex] = TRUE;
-				printf("%d", adj->vertex);
-				index = adj->vertex;
-				adj = head->adjList_H[index];
+				push(w->vertex);
+				head->visited[w->vertex] = TRUE;
+				printf(" %d", w->vertex);
+				index = w->vertex;
+				w = head->adjList_H[index];
 			}
 			else
-				adj = adj->next;
+				w = w->next;
 		}
-
 		index = pop();
 	}
 
 }
+
+//int isEmpty()				// stact이 비어있는지 확인한다.
+//{
+//	if (top == NULL)
+//		return 1;
+//	else
+//		return 0;
+//}
+//
+//int pop()
+//{
+//	int item;
+//	node* temp = top;
+//
+//	if (isEmpty())
+//	{
+//		printf("\n\n Stack is Empyh!\n");
+//		return 0;
+//	}
+//	else
+//	{
+//		item = temp->vertex;
+//		top = temp->next;
+//		free(temp);
+//		return item;
+//	}
+//
+//}
+//
+//void push(int item)
+//{
+//	node* temp = (node*)malloc(sizeof(node));
+//	temp->vertex = item;
+//	temp->next = top;
+//	top = temp;
+//}
+//
+//void DFS(adjList* head)
+//{
+//	int index;
+//	node* adj;
+//	top = NULL;
+//
+//	printf("\nChoice Start Vertex : ");				// 시작 vertex 입력받기
+//	scanf("%d", &index);
+//
+//	if ((index < 0) || (index > MAX_VERTEX))
+//	{
+//		printf("There is no vertex in Graph!!\n");
+//		return;
+//	}
+//
+//	push(index);						// dfs 시작
+//	head->visited[index] = TRUE;
+//	printf("%d", index);
+//
+//	while (!isEmpty())
+//	{
+//		adj = head->adjList_H[index];
+//		while (adj)
+//		{
+//			if (!(head->visited[adj->vertex]))
+//			{
+//				push(adj->vertex);
+//				head->visited[adj->vertex] = TRUE;
+//				printf("%d", adj->vertex);
+//				index = adj->vertex;
+//				adj = head->adjList_H[index];
+//			}
+//			else
+//				adj = adj->next;
+//		}
+//
+//		index = pop();
+//	}
+//
+//}
 
 LQueueType* createQueue()
 {
