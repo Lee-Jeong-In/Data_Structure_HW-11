@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #define MAX_VERTEX 10
 
 #define TRUE 1
@@ -8,14 +9,13 @@
 
 typedef struct Node			// 노드 구조체
 {
-    int vertex;
-    struct Node* next;
+	int vertex;
+	struct Node* next;
 }node;
 
 typedef struct Adj_List		// 리스트 구조체
-{
-	int n;					// 정점개수
-	int vertex_count;
+{				
+	int n;				// 정점개수
 	node* adjList_H[MAX_VERTEX];	// 노드 구조체 배열
 	int visited[MAX_VERTEX];		// stack용 visited 배열
 	int Q_visited[MAX_VERTEX];		// queue용 visited 배열
@@ -30,7 +30,7 @@ typedef struct QNode
 }QNode;
 
 typedef struct {
-	QNode* front,*rear;
+	QNode* front, * rear;
 }LQueueType;
 
 LQueueType* createQueue();
@@ -39,12 +39,12 @@ void enQueue(LQueueType* LQ, int v);
 int deQueue(LQueueType* LQ);
 
 node* queue[MAX_VERTEX];
-int front=-1;
-int rear=-1;
+int front = -1;
+int rear = -1;
 node* Dequeue();
 void Enqueue(node* anode);
 
-void InitializeGraph(adjList* head);
+void InitGraph(adjList* head);
 void InsertVertex(adjList* head);
 void InsertEdge(adjList* head);
 void PrintGraph(adjList* head);
@@ -63,12 +63,13 @@ int main()
 {
 	char command;
 
-	adjList* head=NULL;
+	adjList* head;
+	head = (adjList*)malloc(sizeof(adjList));
 
 	printf("[----- [이정인] [2019038015] -----]\n");
 
 
-	do{
+	do {
 		printf("\n\n");
 		printf("---------------------------------------------------------------\n");
 		printf("                         Graph Searches                        \n");
@@ -82,27 +83,27 @@ int main()
 		printf("Command = ");
 		scanf(" %c", &command);
 
-		switch(command) {
+switch (command) {
 		case 'z': case 'Z':
-			InitializeGraph(head);		
+			InitGraph(head);
 			break;
 		case 'q': case 'Q':
-			FreeGraph(head);				
+			FreeGraph(head);
 			break;
 		case 'v': case 'V':
-			InsertVertex(head);			
+			InsertVertex(head);
 			break;
 		case 'e': case 'E':
 			InsertEdge(head);
 			break;
 		case 'd': case 'D':
-			DFS(head);		
+			DFS(head);
 			break;
 		case 'b': case 'B':
-			BFS(head);		
+			BFS(head);
 			break;
 		case 'p': case 'P':
-			PrintGraph(head);				
+			PrintGraph(head);
 			break;
 
 		default:
@@ -110,44 +111,40 @@ int main()
 			break;
 		}
 
-	}while(command != 'q' && command != 'Q');
+	} while (command != 'q' && command != 'Q');
 
 	return 0;
 }
 
-void InitializeGraph(adjList* head)		// 인접리스트 초기화
+void InitGraph(adjList* head)		// 인접리스트 초기화
 {
-	while(head!=NULL)
-		free(head);
+	head->n = 0;						// 인접 리스트에 연결된 정점 갯수 초기화
 
-	head=(adjList*)malloc(sizeof(adjList));
+	//head = (adjList*)malloc(sizeof(adjList));
+						
 
-	head->n=0;						// 인접 리스트에 연결된 정점 갯수 초기화
-	head->vertex_count=0;					// 실행횟수
+	for (int i = 0; i < MAX_VERTEX; i++)	// 인접 리스트의 각 index마다의 노드구
+	{
+		head->adjList_H[i] = NULL;			// 인접리스트 초기화
+		head->visited[i] = FALSE;			// stact visit 초기화
+		head->Q_visited[i] = FALSE;			// Q_visit 초기화
+	}
 
-	for(int i=0;i<MAX_VERTEX;i++)	// 인접 리스트의 각 index마다의 노드구
-		head->adjList_H[i]=NULL;
-
-	for(int i=0;i<MAX_VERTEX;i++)	// DFS에서 사용
-		head->visited[i]=FALSE;
-
-	for(int i=0;i<MAX_VERTEX;i++)	// BFS에서 사용
-		head->Q_visited[i]=FALSE;	
 }
 
 void FreeGraph(adjList* head)			// Graph 해제
 {
-	node* temp=NULL;
-	node* del=NULL;
+	node* temp = NULL;
+	node* del = NULL;
 
-	for(int i=0;i<MAX_VERTEX;i++)
+	for (int i = 0; i < MAX_VERTEX; i++)
 	{
-		temp=head->adjList_H[i];
+		temp = head->adjList_H[i];
 
-		while(temp!=NULL)
+		while (temp != NULL)
 		{
-			del=temp;
-			temp=temp->next;
+			del = temp;
+			temp = temp->next;
 
 			free(del);
 		}
@@ -160,85 +157,131 @@ void FreeGraph(adjList* head)			// Graph 해제
 void InsertVertex(adjList* head)		// input만큼 vertex만들기 (인접리스트에 메모리 할당하기)
 {
 	int inputNum;
+	node* newNode;
 
 	do
 	{
-		printf("Input Number of Vertex(0~10) : ");
-		scanf("%d",&inputNum);
-	}while((inputNum<0)||(inputNum>MAX_VERTEX));
+		printf("Input Number of Vertex(1~10) : ");		
+		scanf("%d", &inputNum);
+	} while ((inputNum < 0) || (inputNum > MAX_VERTEX));
 
-	if(head->adjList_H[inputNum]!=NULL)							// 이미 있는 vertex
+	//if (head->adjList_H[inputNum]!= )								인접 리스트에서는 중복 노드가 발생한다.
+	//{
+	//	printf("\n\t<lready have [%d]Vertex>", inputNum);
+	//	return;
+	//}
+
+	for (int i = 0; i < inputNum; i++)
 	{
-		printf("\n\t<lready have [%d]Vertex>",inputNum);
-		return;
+		head->n++;
+
+		head->adjList_H[i]=(node*)malloc(sizeof(node));
+		head->adjList_H[i]->vertex = i;
+		head->adjList_H[i]->next = NULL;
+
+		printf("\nVertex[%d] is generted", i);
 	}
 
-	head->adjList_H[inputNum]=(node*)malloc(sizeof(node));		// 새로운 vertex 생성
-	head->adjList_H[inputNum]->vertex=inputNum;
-	head->adjList_H[inputNum]->next=NULL;
 
-	head->vertex_count++;
-
-	printf("\nMake [%d] vertexes\n",inputNum);
+//	if (((head->vertex_count) + 1) > MAX_VERTEX)
+//	{
+//		printf("\n 그래프 정점 개수를 초과\n");
+//		return;
+//	}
+//
+//	head->adjList_H[inputNum] = (node*)malloc(sizeof(node));		// 새로운 vertex 생성
+//	head->adjList_H[inputNum]->vertex = inputNum;
+//	head->adjList_H[inputNum]->next = NULL;
+//
+//	head->vertex_count++;
+//
+//	printf("\nMake [%d] vertexes\n", inputNum);
 }
 
 void InsertEdge(adjList* head)			// 문제점 vertex의 메모리 leak가 발생 할 수 있다.
 {
-	int index,input;
+	int index, input;
+	node* newNode = NULL;
 
-	node* newNode=NULL;
-
+	printf("Max Vertex is %d", head->n);
 	printf("\nChoice Start Vertex : ");				// 시작 vertex 입력받기
-	scanf("%d",&index);
+	scanf("%d", &index);
 
-	if((index<0)||(index>MAX_VERTEX))
+	if ((index < 0) || (index > head->n))
 	{
 		printf("There is no vertex in Graph!!\n");
 		return;
 	}
 
 	printf("\nNumber of Vertex to connect : ");		// input받기
-	scanf("%d",&input);
+	scanf("%d", &input);
 
-	newNode=(node*)malloc(sizeof(node));			// 새로운 노드 만들고
-	newNode->vertex=index;
-	newNode->next=NULL;
-
-	if(head->adjList_H[index]->next==NULL)		// 아무것도 없고+맨 처음일 때
+	if ((input < 0) || (input > head->n))
 	{
-		head->adjList_H[index]->next=newNode;
+		printf("There is no vertex in Graph!!\n");
 		return;
 	}
 	
-	node* temp=head->adjList_H[index]->next;
-	node* trail=head->adjList_H[index]->next;
-
-	while(temp!=NULL)									
+	// 그래프 중복 확인하기
+	if(head->adjList_H[index] != NULL)
 	{
-		if(temp->vertex>=newNode->vertex)
+		node* temp = head->adjList_H[index]->next;
+		while (temp != NULL)
 		{
-			if(temp==head->adjList_H[index]->next)		// 뒤에 노드가 있는데 처음으로 삽입 해야 할 때
+			if (temp->vertex == input)
 			{
-				head->adjList_H[index]->next=newNode;
-				newNode->next=temp;
+				printf("Already Connected!!\n");
+				return;
+			}
+			temp = temp->next;
+		}
+	}
+
+	newNode = (node*)malloc(sizeof(node));			// 새로운 노드 만들고
+	newNode->vertex = input;
+	newNode->next = NULL;
+
+	//if (head->adjList_H[index]->next == NULL)		// 아무것도 없고+맨 처음일 때
+	//{
+	//	head->adjList_H[index]->next = newNode;
+	//	return;
+	//}
+
+	node* temp = head->adjList_H[index];
+	node* trail = head->adjList_H[index];
+
+	if (temp == NULL)
+	{
+		printf("There is no vertex in Graph!!\n");
+		return;
+	}
+
+	while (temp != NULL)
+	{
+		if (temp->vertex >= newNode->vertex)
+		{
+			if (temp == head->adjList_H[index]->next)		// 뒤에 노드가 있는데 처음으로 삽입 해야 할 때
+			{
+				head->adjList_H[index]->next = newNode;
+				newNode->next = temp;
 			}
 			else										// 중간에 삽입 해야 할때
 			{
-				newNode->next=temp;
-				trail->next=newNode;
+				newNode->next = temp;
+				trail->next = newNode;
 			}
-			return ;
+			return;
 		}
-		trail=temp;
-		temp=temp->next;
+		trail = temp;
+		temp = temp->next;
 	}
-	trail->next=newNode;									// 마지막에 삽입할 때
+	trail->next = newNode;									// 마지막에 삽입할 때
 	return;
 }
 
 int isEmpty()				// stact이 비어있는지 확인한다.
 {
-	if(top==NULL)
+	if (top == NULL)
 		return 1;
 	else
 		return 0;
@@ -247,17 +290,17 @@ int isEmpty()				// stact이 비어있는지 확인한다.
 int pop()
 {
 	int item;
-	node* temp=top;
+	node* temp = top;
 
-	if(isEmpty())
+	if (isEmpty())
 	{
 		printf("\n\n Stack is Empyh!\n");
 		return 0;
 	}
 	else
 	{
-		item=temp->vertex;
-		top=temp->next;
+		item = temp->vertex;
+		top = temp->next;
 		free(temp);
 		return item;
 	}
@@ -266,49 +309,49 @@ int pop()
 
 void push(int item)
 {
-	node* temp=(node*)malloc(sizeof(node));
-	temp->vertex=item;
-	temp->next=top;
-	top=temp;
+	node* temp = (node*)malloc(sizeof(node));
+	temp->vertex = item;
+	temp->next = top;
+	top = temp;
 }
 
 void DFS(adjList* head)
 {
 	int index;
 	node* adj;
-	top=NULL;
+	top = NULL;
 
 	printf("\nChoice Start Vertex : ");				// 시작 vertex 입력받기
-	scanf("%d",&index);
+	scanf("%d", &index);
 
-	if((index<0)||(index>MAX_VERTEX))
+	if ((index < 0) || (index > MAX_VERTEX))
 	{
 		printf("There is no vertex in Graph!!\n");
 		return;
 	}
 
 	push(index);						// dfs 시작
-	head->visited[index]=TRUE;
-	printf("%d",index);
+	head->visited[index] = TRUE;
+	printf("%d", index);
 
-	while(!isEmpty())
+	while (!isEmpty())
 	{
-		adj=head->adjList_H[index];
-			while(adj)
+		adj = head->adjList_H[index];
+		while (adj)
+		{
+			if (!(head->visited[adj->vertex]))
 			{
-				if(!(head->visited[adj->vertex]))
-				{
-					push(adj->vertex);
-					head->visited[adj->vertex]=TRUE;
-					printf("%d",adj->vertex);
-					index=adj->vertex;
-					adj=head->adjList_H[index];
-				}
-				else
-					adj=adj->next;
+				push(adj->vertex);
+				head->visited[adj->vertex] = TRUE;
+				printf("%d", adj->vertex);
+				index = adj->vertex;
+				adj = head->adjList_H[index];
 			}
+			else
+				adj = adj->next;
+		}
 
-		index=pop();
+		index = pop();
 	}
 
 }
@@ -316,15 +359,15 @@ void DFS(adjList* head)
 LQueueType* createQueue()
 {
 	LQueueType* LQ;
-	LQ=(LQueueType*)malloc(sizeof(LQueueType));
-	LQ->front=NULL;
-	LQ->rear=NULL;
+	LQ = (LQueueType*)malloc(sizeof(LQueueType));
+	LQ->front = NULL;
+	LQ->rear = NULL;
 	return LQ;
 }
 
 int Q_isEmpty(LQueueType* LQ)
 {
-	if(LQ->front==NULL)
+	if (LQ->front == NULL)
 	{
 		printf("\n Linked Queue is empty..\n");
 		return 1;
@@ -333,38 +376,38 @@ int Q_isEmpty(LQueueType* LQ)
 		return 0;
 }
 
-void enQueue(LQueueType* LQ,int v)
+void enQueue(LQueueType* LQ, int v)
 {
-	QNode* newNode=(QNode*)malloc(sizeof(QNode));
-	newNode->data=v;
-	newNode->link=NULL;
+	QNode* newNode = (QNode*)malloc(sizeof(QNode));
+	newNode->data = v;
+	newNode->link = NULL;
 
-	if(LQ->front==NULL)
+	if (LQ->front == NULL)
 	{
-		LQ->front=newNode;
-		LQ->rear=newNode;
+		LQ->front = newNode;
+		LQ->rear = newNode;
 	}
 	else
 	{
-		LQ->rear->link=newNode;
-		LQ->rear=newNode;
+		LQ->rear->link = newNode;
+		LQ->rear = newNode;
 	}
 }
 int deQueue(LQueueType* LQ)
 {
-	QNode *old=LQ->front;
+	QNode* old = LQ->front;
 	int item;
 
-	if(Q_isEmpty(LQ))
+	if (Q_isEmpty(LQ))
 		return 0;
 
 	else
 	{
-		item=old->data;
-		LQ->front=LQ->front->link;
-		if(LQ->front==NULL)
-			LQ->rear=NULL;
-		
+		item = old->data;
+		LQ->front = LQ->front->link;
+		if (LQ->front == NULL)
+			LQ->rear = NULL;
+
 		free(old);
 		return item;
 	}
@@ -378,29 +421,29 @@ void BFS(adjList* head)
 	LQueueType* Q;
 
 	printf("\nChoice Start Vertex : ");				// 시작 vertex 입력받기
-	scanf("%d",&index);
+	scanf("%d", &index);
 
-	if((index<0)||(index>MAX_VERTEX))
+	if ((index < 0) || (index > MAX_VERTEX))
 	{
 		printf("There is no vertex in Graph!!\n");
 		return;
 	}
 
-	Q=createQueue();
-	head->Q_visited[index]=TRUE;
-	printf("%d",index);
-	enQueue(Q,index);
+	Q = createQueue();
+	head->Q_visited[index] = TRUE;
+	printf("%d", index);
+	enQueue(Q, index);
 
-	while(!Q_isEmpty(Q))
+	while (!Q_isEmpty(Q))
 	{
-		index=deQueue(Q);
-		for(w=head->adjList_H[index];w;w=w->next)
+		index = deQueue(Q);
+		for (w = head->adjList_H[index]; w; w = w->next)
 		{
-			if(!(head->Q_visited[w->vertex]))
+			if (!(head->Q_visited[w->vertex]))
 			{
-				head->Q_visited[w->vertex]=TRUE;
-				printf("%d",w->vertex);
-				enQueue(Q,w->vertex);
+				head->Q_visited[w->vertex] = TRUE;
+				printf("%d", w->vertex);
+				enQueue(Q, w->vertex);
 			}
 		}
 	}
@@ -414,16 +457,17 @@ void BFS(adjList* head)
 void PrintGraph(adjList* head)
 {
 	node* temp;
-	
-	for(int i=0;i<MAX_VERTEX;i++)
+
+	for (int i = 0; i < MAX_VERTEX; i++)
 	{
-		printf("\n	정점 [%d]의 인접리스트 : ",i);
-		temp=head->adjList_H[i];
-		while(temp)
+		printf("\n	정점 [%d]의 인접리스트 : ", i);
+		temp = head->adjList_H[i];
+		while (temp)
 		{
-			printf("%d -> ",temp->vertex);
-			temp=temp->next;
+			printf("%d -> ", temp->vertex);
+			temp = temp->next;
 		}
+		printf("END");
 	}
 }
 
