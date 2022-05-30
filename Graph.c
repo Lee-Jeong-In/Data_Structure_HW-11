@@ -185,6 +185,9 @@ void InsertEdge(adjList* head)					// <주의> vertex의 메모리 leak가 발생 할 수 �
 	int index, input;
 	node* newNode = NULL;
 
+	node* temp=NULL;
+	node* trail=NULL;
+
 	printf("Max Vertex is %d", head->n);
 	printf("\nChoice Start Vertex : ");				// 시작 vertex 입력받기
 	scanf("%d", &index);
@@ -221,8 +224,15 @@ void InsertEdge(adjList* head)					// <주의> vertex의 메모리 leak가 발생 할 수 �
 
 	newNode = (node*)malloc(sizeof(node));			// 새로운 edge만들기
 	newNode->vertex = input;
-	newNode->next = head->adjList_H[index];
-	head->adjList_H[index] = newNode;
+	newNode->next=NULL;
+
+	temp=head->adjList_H[index];
+	while(temp!=NULL)					// temp를 해당 인접 리스트의 마지막 노드로 보내기
+	{
+		trail=temp;
+		temp=temp->next;
+	}
+	trail->next=newNode;
 
 }
 
